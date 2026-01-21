@@ -2,7 +2,7 @@ import requests
 import base64
 import json
 
-API_URL = 'http://64.135.37.214:8080/api/v1'
+API_URL = 'http://localhost:8080/api/v1'
 API_KEY = 'B5D31933-C996-476C-B116-EF212A41479A'
 API_ID = '1093'
 USER = '001'
