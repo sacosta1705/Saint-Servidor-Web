@@ -1,10 +1,10 @@
-# Documentación Complementaria
+# Documentación Técnica del Repositorio de Ejemplos
 
-Bienvenidos a la documentación técnica extendida de la integración con Saint Sync Server.
+Este directorio contiene las especificaciones detalladas para la correcta integración con el Saint Sync Server, complementando las referencias de endpoints disponibles en la colección de Postman.
 
-### Contenidos:
-1. [Autenticación y Sesiones](./authentication.md): Cómo manejar el ciclo de vida de la conexión.
-2. [Consultas y Filtros](./querying_and_filtering.md): Cómo extraer datos de manera eficiente.
-3. [Solución de Problemas](./troubleshooting.md): Guía de errores comunes y sus soluciones.
+## Contenido Técnico
+1. [Protocolo de Autenticación](./autenticacion.md): Detalles sobre la gestión de cabeceras y persistencia de sesión.
+2. [Sintaxis de Consultas](./consultar_y_filtros.md): Guía de uso de operadores y parámetros de optimización.
+3. [Guía de Diagnóstico](./errores_comunes.md): Protocolos de resolución ante códigos de error del servidor.
 
-**Nota:** Para probar los endpoints de forma interactiva, por favor dirígete a nuestra [Documentación en Postman](https://documenter.getpostman.com/view/31311438/2sB3HnMLcm).
+Para la ejecución de pruebas dinámicas y consulta de esquemas JSON, se recomienda remitirse a la [Documentación Oficial en Postman](https://documenter.getpostman.com/view/31311438/2sB3HnMLcm).
