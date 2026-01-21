@@ -34,8 +34,7 @@ def iniciar_sesion():
         else:
             return None
     except requests.exceptions.RequestException as e:
-        print(e)
-        return None
+        return e
 
 if __name__ == "__main__":
     token = iniciar_sesion()
