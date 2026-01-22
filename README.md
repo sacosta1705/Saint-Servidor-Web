@@ -26,7 +26,6 @@ En la carpeta [`/examples`](./examples) se encuentran implementaciones de refere
 | :--- | :--- | :--- |
 | **Python** | Disponible | [Ir a ejemplos](./examples/python) |
 | **JavaScript** | Disponible | [Ir a ejemplos](./examples/javascript) |
-| **Java** | Disponible | [Ir a ejemplos](./examples/java) |
 | **Pascal / Delphi** | Disponible | [Ir a ejemplos](./examples/pascal) |
 
 ---
