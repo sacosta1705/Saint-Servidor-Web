@@ -94,29 +94,25 @@ begin
   memoLog.Lines.Add('1. Solicitando sesion...');
   Token := IniciarSesion;
 
-  if Token = '' then Exit;
+  if Token = '' then
+    Exit;
 
   HTTP := TNetHTTPClient.Create(nil);
   JSONData := TJSONObject.Create;
   try
-    // Mantenemos el flotante como en tu prueba de Postman
-    JSONData.AddPair('existen', TJSONNumber.Create(StrToFloatDef(edNuevaExistencia.Text, 0)));
+    JSONData.AddPair('existen',
+      TJSONNumber.Create(StrToFloatDef(edNuevaExistencia.Text, 0)));
     JsonString := JSONData.ToString;
 
     Endpoint := API_URL + '/adm/product/' + edCodProd.Text;
 
     HTTP.CustomHeaders['Pragma'] := Token;
-    // Eliminamos cualquier header previo para evitar conflictos
     HTTP.CustomHeaders['Accept'] := 'application/json';
 
-    // IMPORTANTE: UTF8 sin BOM (Byte Order Mark)
-    // Delphi por defecto añade bytes de control al inicio del stream que Postman NO envía.
-    // El servidor puede estar fallando al intentar castear esos bytes.
     RequestBody := TStringStream.Create(JsonString, TEncoding.UTF8, False);
     try
       memoLog.Lines.Add('5. Enviando JSON (Sin BOM): ' + JsonString);
 
-      // Enviamos usando el arreglo de headers para asegurar el Content-Type correcto
       Response := HTTP.Put(Endpoint, RequestBody, nil,
         [TNetHeader.Create('Content-Type', 'application/json')]);
 
@@ -124,7 +120,8 @@ begin
       if Response.StatusCode in [200, 201] then
         memoLog.Lines.Add('Éxito: Producto actualizado correctamente.')
       else
-        memoLog.Lines.Add('Fallo: ' + Response.StatusCode.ToString + ' - ' + Response.ContentAsString);
+        memoLog.Lines.Add('Fallo: ' + Response.StatusCode.ToString + ' - ' +
+          Response.ContentAsString);
 
     finally
       RequestBody.Free;
