@@ -9,28 +9,26 @@ USER = '001'
 PASSWORD = '12345'
 
 def iniciar_sesion():
-    endpoint = API_URL + '/main/login'
-    auth_str = f'{USER}:{PASSWORD}'
-    auth =  base64.b64encode(auth_str.encode()).decode()
+    endpoint = API_URL + '/auth/login'
 
     headers = {
         'x-api-key': API_KEY,
-        'x-api-id': API_ID,
-        'Authorization': f'Basic {auth}'
+        'x-api-id': API_ID
     }
 
     body = {
-        'terminal': 'python'
+        "username": USER,
+        "password": PASSWORD,
+        "device_id":"Python",
     }
 
     try:
         response = requests.post(endpoint, headers=headers, json=body)
         response.raise_for_status()
+        jsonResonse = response.json()
 
-        session_token = response.headers.get('Pragma')
-
-        if session_token:
-            return session_token
+        if jsonResonse.get('success') and 'data' in jsonResonse:
+            return jsonResonse['data']['access_token']
         else:
             return None
     except requests.exceptions.RequestException as e:

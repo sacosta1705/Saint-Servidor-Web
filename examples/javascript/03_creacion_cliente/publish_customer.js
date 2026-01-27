@@ -1,6 +1,6 @@
 const {iniciarSesion, API_URL} = require('../01_autenticacion_fetch_axios/auth_session');
 
-async function publicarClientes() {
+async function publicarCliente() {
     const token = await iniciarSesion();
 
     if(!token) {
@@ -8,34 +8,26 @@ async function publicarClientes() {
         return;
     }
 
-    const endpoint = `${API_URL}/adm/customer`;
+    const endpoint = `${API_URL}/customers`;
 
-    const clientes = [
+    const cliente = 
         {
-            "codclie": "JS-001",
+            "codclie": "JS-999",
             "descrip": "DESARROLLOS JS LIMITADA",
             "id3": "V10203040",
             "activo": 1
-        },
-        {
-            "codclie": "JS-002",
-            "descrip": "SISTEMAS INTEGRADOS NODE",
-            "id3": "V50607080",
-            "activo": 1
-        }
-    ];
+        };
 
     const headers = {
-        'Pragma': token,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
     };
 
     try {
-        console.log(`enviando lote de ${clientes.length} clientes...`);
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(clientes)
+            body: JSON.stringify(cliente)
         });
 
         if (response.ok) {
@@ -51,5 +43,5 @@ async function publicarClientes() {
 }
 
 if(require.main === module){
-    publicarClientes();
+    publicarCliente();
 }

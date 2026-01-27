@@ -1,5 +1,5 @@
 import requests
-import base64
+import json
 
 API_URL = 'http://localhost:8080/api/v1'
 API_KEY = 'B5D31933-C996-476C-B116-EF212A41479A'
@@ -8,23 +8,30 @@ USER = '001'
 PASSWORD = '12345'
 
 def iniciar_sesion():
-
-    endpoint = f"{API_URL}/main/login"
-    auth_str = f"{USER}:{PASSWORD}"
-    auth_b64 = base64.b64encode(auth_str.encode()).decode()
+    endpoint = API_URL + '/auth/login'
 
     headers = {
         'x-api-key': API_KEY,
-        'x-api-id': API_ID,
-        'Authorization': f'Basic {auth_b64}'
+        'x-api-id': API_ID
+    }
+
+    body = {
+        "username": USER,
+        "password": PASSWORD,
+        "device_id":"Python",
     }
 
     try:
-        response = requests.post(endpoint, headers=headers, json={'terminal': 'python_bulk'})
+        response = requests.post(endpoint, headers=headers, json=body)
         response.raise_for_status()
-        return response.headers.get('Pragma')
-    except requests.exceptions.RequestException:
-        return None
+        jsonResonse = response.json()
+
+        if jsonResonse.get('success') and 'data' in jsonResonse:
+            return jsonResonse['data']['access_token']
+        else:
+            return None
+    except requests.exceptions.RequestException as e:
+        return e
 
 def sincronizar_clientes_masivo():
     token = iniciar_sesion()
@@ -33,39 +40,25 @@ def sincronizar_clientes_masivo():
         print("Error: No se pudo establecer la sesión para la carga masiva.")
         return
 
-    endpoint = f"{API_URL}/adm/customer"
+    endpoint = f"{API_URL}/customers"
 
-    lote_clientes = [
-        {
+    cliente = {
             "codclie": "PY001",
             "descrip": "CLIENTE MASIVO 1",
             "id3": "V10000001",
             "activo": 1
-        },
-        {
-            "codclie": "PY002",
-            "descrip": "CLIENTE MASIVO 2",
-            "id3": "V10000002",
-            "activo": 1
-        },
-        {
-            "codclie": "PY003",
-            "descrip": "CLIENTE MASIVO 3",
-            "id3": "V10000003",
-            "activo": 1
         }
-    ]
 
     headers = {
-        'Pragma': token,
+        'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
     }
 
     try:
-        response = requests.post(endpoint, headers=headers, json=lote_clientes)
+        response = requests.post(endpoint, headers=headers, json=cliente)
         
         if response.status_code in [200, 201]:
-            print(f"Sincronización exitosa. Registros procesados: {len(lote_clientes)}")
+            print(f"Sincronización exitosa. Registros procesados.")
         else:
             print(f"Fallo en la sincronización: {response.status_code} - {response.text}")
 

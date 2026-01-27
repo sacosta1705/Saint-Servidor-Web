@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2026/01/27 14:12:55.468,=C:\Users\sacos\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/01/27 14:14:05.279,C:\projects\saint_api_repo\examples\pascal\03_actualizacion_de_inventarios\act_datos.pas=C:\Users\sacos\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/01/27 14:14:05.279,C:\projects\saint_api_repo\examples\pascal\03_actualizacion_de_inventarios\act_datos.fmx=C:\Users\sacos\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
+    <Transaction>2026/01/27 14:14:17.064,C:\projects\saint_api_repo\examples\pascal\03_actualizacion_de_inventarios\actualizacion_datos.dproj=C:\Users\sacos\OneDrive\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

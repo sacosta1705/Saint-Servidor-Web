@@ -1,6 +1,5 @@
 program lectura_datos;
 
-{$APPTYPE CONSOLE}
 {$R *.res}
 
 uses
@@ -19,30 +18,54 @@ const
   API_ID = '1093';
   USER = '001';
   PASSWORD = '12345';
+  DEVICE_ID = 'DELPHI_APP_02'; // Requerido en v2
 
 function IniciarSesion: string;
 var
   HTTP: TNetHTTPClient;
   Response: IHTTPResponse;
   RequestBody: TStringStream;
-  AuthB64: string;
   JSONBody: TJSONObject;
+  JSONResponse, JSONData: TJSONValue;
 begin
   Result := '';
   HTTP := TNetHTTPClient.Create(nil);
   JSONBody := TJSONObject.Create;
   try
-    AuthB64 := TNetEncoding.Base64.Encode(USER + ':' + PASSWORD);
+    // 1. Headers de Identificacion (Solo para Login)
     HTTP.CustomHeaders['x-api-key'] := API_KEY;
     HTTP.CustomHeaders['x-api-id'] := API_ID;
-    HTTP.CustomHeaders['Authorization'] := 'Basic ' + AuthB64;
     HTTP.ContentType := 'application/json';
-    JSONBody.AddPair('terminal', 'delphi_listing');
+
+    // 2. Body JSON con credenciales
+    JSONBody.AddPair('username', USER);
+    JSONBody.AddPair('password', PASSWORD);
+    JSONBody.AddPair('device_id', DEVICE_ID);
+
     RequestBody := TStringStream.Create(JSONBody.ToString, TEncoding.UTF8);
     try
-      Response := HTTP.Post(API_URL + '/main/login', RequestBody);
+      // 3. Endpoint actualizado /auth/login
+      Response := HTTP.Post(API_URL + '/auth/login', RequestBody);
+
       if Response.StatusCode = 200 then
-        Result := Response.HeaderValue['Pragma'];
+      begin
+        // 4. Parsear JSON para sacar el Token
+        JSONResponse := TJSONObject.ParseJSONValue
+          (Response.ContentAsString(TEncoding.UTF8));
+        try
+          if Assigned(JSONResponse) and (JSONResponse is TJSONObject) then
+          begin
+            JSONData := (JSONResponse as TJSONObject).GetValue('data');
+            if Assigned(JSONData) and (JSONData is TJSONObject) then
+              Result := (JSONData as TJSONObject)
+                .GetValue('access_token').Value;
+          end;
+        finally
+          JSONResponse.Free;
+        end;
+      end
+      else
+        Writeln('Error Login: ' + Response.StatusText);
     finally
       RequestBody.Free;
     end;
@@ -56,45 +79,59 @@ procedure ConsultarExistencias(const AToken: string);
 var
   HTTP: TNetHTTPClient;
   Response: IHTTPResponse;
-  JSonData: TJSONValue;
+  JSONRoot, JSONData: TJSONValue;
   JSONArray: TJSONArray;
   I: Integer;
-  Item: TJSONValue;
+  Item: TJSONObject;
   Endpoint: string;
 begin
   HTTP := TNetHTTPClient.Create(nil);
   try
-    Endpoint := API_URL + '/adm/products?existen>0&limit=5';
+    // 1. Endpoint actualizado (sin /adm) y filtros en URL
+    // Nota: 'existen' debe ser un campo valido en tu BD o View
+    Endpoint := API_URL + '/products?existen>0&limit=5';
 
-    HTTP.CustomHeaders['Pragma'] := AToken;
+    // 2. Header Authorization Bearer
+    HTTP.CustomHeaders['Authorization'] := 'Bearer ' + AToken;
 
     Response := HTTP.Get(Endpoint);
 
     if Response.StatusCode = 200 then
     begin
-      JSonData := TJSONObject.ParseJSONValue(Response.ContentAsString);
+      JSONRoot := TJSONObject.ParseJSONValue
+        (Response.ContentAsString(TEncoding.UTF8));
       try
-        if JSonData is TJSONArray then
+        // 3. Validar estructura v2 { success: true, data: [...] }
+        if (JSONRoot is TJSONObject) and (JSONRoot as TJSONObject)
+          .GetValue('success').Value.ToBoolean then
         begin
-          JSONArray := JSonData as TJSONArray;
-          WriteLn(Format('Productos encontrados: %d', [JSONArray.Count]));
-          WriteLn('----------------------------------------------------');
+          // Extraer el array de la propiedad 'data'
+          JSONData := (JSONRoot as TJSONObject).GetValue('data');
 
-          for I := 0 to JSONArray.Count - 1 do
+          if JSONData is TJSONArray then
           begin
-            Item := JSONArray.Items[I];
-            WriteLn(Format('Cod: %-10s | Stock: %-6s | Desc: %s',
-              [Item.GetValue<string>('codprod'),
-              Item.GetValue<string>('existen'),
-              Item.GetValue<string>('descrip')]));
+            JSONArray := JSONData as TJSONArray;
+            Writeln(Format('Productos encontrados: %d', [JSONArray.Count]));
+            Writeln('----------------------------------------------------');
+
+            for I := 0 to JSONArray.Count - 1 do
+            begin
+              Item := JSONArray.Items[I] as TJSONObject;
+              // 4. Usar .GetValue().Value para compatibilidad
+              Writeln(Format('Cod: %-10s | Stock: %-6s | Desc: %s',
+                [Item.GetValue('codprod').Value, Item.GetValue('existen').Value,
+                Item.GetValue('descrip').Value]));
+            end;
           end;
-        end;
+        end
+        else
+          Writeln('Error logico o sin datos: ' + Response.ContentAsString);
       finally
-        JSonData.Free;
+        JSONRoot.Free;
       end;
     end
     else
-      WriteLn('Error en consulta: ' + Response.StatusText);
+      Writeln('Error HTTP en consulta: ' + Response.StatusText);
   finally
     HTTP.Free;
   end;
@@ -109,13 +146,16 @@ begin
     if SessionToken <> '' then
       ConsultarExistencias(SessionToken)
     else
-      WriteLn('No se pudo establecer sesion.');
+      Writeln('No se pudo establecer sesion.');
 
-    WriteLn('Presione Enter para salir...');
+    Writeln('Presione Enter para salir...');
     ReadLn;
   except
     on E: Exception do
-      WriteLn(E.ClassName, ': ', E.Message);
+    begin
+      Writeln(E.ClassName, ': ', E.Message);
+      ReadLn; // Pausa para ver el error
+    end;
   end;
 
 end.
