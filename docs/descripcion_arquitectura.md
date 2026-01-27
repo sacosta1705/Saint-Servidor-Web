@@ -16,7 +16,7 @@ graph TD
     
     subgraph "Núcleo del Servidor"
         SyncServer -->|"Auth (JWT)"| Security[Módulo de Seguridad]
-        SyncServer -->|Procesamiento de Lenguaje| AI["Motor de IA (Gemini/OpenAI")]
+        SyncServer -->|Procesamiento de Lenguaje| AI["Motor de IA ej. Gemini/OpenAI"]
         SyncServer -->|Eventos| Webhooks[Gestor de Webhooks]
     end
 
