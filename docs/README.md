@@ -9,5 +9,6 @@ Este directorio contiene las especificaciones detalladas para la correcta integr
 4. [Descripción general de arquitectura](./descripcion_arquitectura.md): Explicación general de la arquitectura implementada en el Saint Sync Server y su interactividad con el Saint Enterprise Administrativo.
 5. [Mejores practicas](./mejores_practicas.md): Recomendaciones de las mejores practicas a implementar en las aplicaciones `Clientes`.
 6. [Tipos de datos](./tipos_de_datos.md): Detalles importantes relacionados a los tipos de datos enviados por el `Cliente`.
+7. [Configuración del servidor (config.json)](./configuracion.md): Descripción de los campos disponibles en el archivo de configuración del servidor web.
 
 Para la ejecución de pruebas dinámicas y consulta de esquemas JSON, se recomienda remitirse a la [Documentación Oficial en Postman](https://documenter.getpostman.com/view/31311438/2sB3HnMLcm).
