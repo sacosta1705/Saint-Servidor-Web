@@ -59,7 +59,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsIn...
 Content-Type: application/json
 ```
 
-**Nota Técnica: El servidor rechazará cualquier petición que no incluya un token válido con firma íntegra, retornando HTTP 401 Unauthorized.**
+> **Nota Técnica: El servidor rechazará cualquier petición que no incluya un token válido con firma íntegra, retornando HTTP 401 Unauthorized.**
 
 ## 3. Renovación de Acceso (Refresh Token)
 
