@@ -2,6 +2,7 @@
 __history/
 __recovery/
 win32/
+/.vscode
 GPATH
 GRTAGS
 GTAGS

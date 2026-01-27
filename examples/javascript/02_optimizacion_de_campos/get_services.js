@@ -8,33 +8,52 @@ async function consultarServiciosFiltrados() {
         return;
     }
 
-    const filtros = "precio1>100";
+    const filtros = "precio1>100"; 
     const limite = 5;
-    const endpoint = `${API_URL}/adm/services?${filtros}&limit=${limite}`;
+    
+    const endpoint = `${API_URL}/services?${filtros}&limit=${limite}`;
 
     const headers = {
-        'Pragma': token
+        'Authorization': `Bearer ${token}`, 
+        'Content-Type': 'application/json'
     };
 
     try {
+        console.log(`Consultando: ${endpoint}`);
         const response = await fetch(endpoint, {
             method: "GET",
             headers: headers
         });
 
         if (response.status === 401) {
-            console.error('Sesión expirada');
+            console.error('Error: Sesión expirada o token inválido.');
             return;            
         }
 
-        const servicios = await response.json();
+        if (!response.ok) {
+            console.error(`Error HTTP: ${response.status}`);
+            return;
+        }
 
-        servicios.forEach(servicio => {
-            console.log(`Código: ${servicio.codserv} | Nombre: ${servicio.descrip} | Precio: ${servicio.precio1}`);
-        });
+        const respuesta = await response.json();
+
+        if (respuesta.success && Array.isArray(respuesta.data)) {
+            const servicios = respuesta.data;
+            
+            if (servicios.length === 0) {
+                console.log("No se encontraron servicios con el filtro especificado.");
+            } else {
+                console.log(`\n--- Servicios Encontrados (${servicios.length}) ---`);
+                servicios.forEach(servicio => {
+                    console.log(`Código: ${servicio.codserv} | Nombre: ${servicio.descrip} | Precio: ${servicio.precio1}`);
+                });
+            }
+        } else {
+            console.error('Respuesta inesperada del servidor:', respuesta);
+        }
 
     } catch (error) {
-        console.error('Error en la consulta:', error.message);
+        console.error('Error de conexión:', error.message);
     }
 }
 

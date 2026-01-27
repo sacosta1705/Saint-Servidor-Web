@@ -1,18 +1,47 @@
-# Mejores Prácticas de Integración y Seguridad
+# Mejores Prácticas de Integración (v2.0)
 
-Para garantizar la estabilidad y escalabilidad de las soluciones que interactúan con el Saint Sync Server, se deben seguir los siguientes lineamientos técnicos.
+Para garantizar una integración estable, segura y de alto rendimiento con el Saint Sync Server, se recomienda adherirse a los siguientes patrones de diseño.
 
 ## 1. Gestión Eficiente de Sesiones
-- **Reutilización de Sesiones**: Se debe evitar el inicio de sesión constante. La aplicación cliente debe persistir el valor de la cabecera `Pragma` y reutilizarlo hasta que el servidor retorne un código `401 Unauthorized`.
-- **Control de Concurrencia**: Minimizar el número de sesiones abiertas simultáneamente por el mismo usuario para evitar la denegación de servicio por agotamiento de recursos en el servidor.
 
-## 2. Optimización de Carga de Datos
-- **Paginación Obligatoria**: En consultas a tablas con alto volumen de registros (ej. Inventarios o Facturación), es imperativo el uso del parámetro `limit` para segmentar la respuesta.
-- **Proyección de Campos**: Se recomienda solicitar únicamente las columnas necesarias para la lógica del negocio mediante la selección de campos en la URL, reduciendo el peso del JSON resultante y el consumo de ancho de banda.
+**NO realizar Login por cada petición.**
+El proceso de inicio de sesión implica validaciones criptográficas y consultas a la base de datos que consumen recursos.
 
-## 3. Seguridad de la Información
-- **Almacenamiento de Credenciales**: Bajo ninguna circunstancia se deben codificar de forma rígida (hardcode) las credenciales `x-api-key` o `Authorization` en aplicaciones de lado del cliente (frontend web o móvil). Se recomienda el uso de variables de entorno o bóvedas de secretos.
-- **Manejo de TLS**: Se sugiere el uso de protocolos HTTPS para cifrar el tráfico entre el cliente y el servidor, protegiendo los tokens de sesión de posibles ataques de intercepción.
+* **Patrón Correcto:**
+    1.  Realizar Login (`/auth/login`) una única vez al iniciar la aplicación.
+    2.  Almacenar el `access_token` y el `refresh_token` en un lugar seguro (Keychain, Secure Storage, etc.).
+    3.  Reutilizar el `access_token` para todas las consultas.
+    4.  Implementar una intercepción de errores: Si el servidor retorna `401 Unauthorized`, usar el endpoint `/auth/refresh` silenciosamente y reintentar la operación.
 
-## 4. Estrategia de Reintentos
-- **Backoff Exponencial**: Ante fallos temporales de conexión o errores de servidor (5xx), la lógica del cliente debe implementar reintentos con intervalos de tiempo crecientes para evitar saturar el servidor tras una caída de servicio.
+## 2. Optimización de Ancho de Banda
+
+Evita traer datos innecesarios (Over-fetching). El servidor soporta proyección de datos nativa.
+
+* **Mala Práctica:**
+    Solicitar el objeto completo de productos (`GET /products`) cuando solo necesitas llenar una lista de precios. Esto transfiere campos pesados como notas largas.
+
+* **Buena Práctica:**
+    Utilizar el parámetro `fields`:
+    `GET /api/v1/products?fields=codprod,descrip,precio1,existencia`
+
+## 3. Delegación de Lógica a la IA
+
+En lugar de descargar miles de registros para filtrarlos en la memoria del dispositivo cliente, utiliza el motor de Inteligencia Artificial del servidor.
+
+* **Escenario:** Filtrar clientes de una zona específica con deuda vencida.
+* **Enfoque v2:**
+    `GET /api/v1/customers?q=`
+    
+    El servidor traducirá esto a SQL optimizado, reduciendo la carga de procesamiento en tu aplicación.
+
+## 4. Seguridad de Credenciales
+
+* **x-api-key y x-api-id:** Estas credenciales identifican tu licencia de desarrollador.
+    * **En Apps Móviles/Escritorio:** Pueden ir embebidas, pero se recomienda ofuscarlas.
+    * **En Web (React/Angular/Vue):** **NUNCA** las expongas en el código del frontend. Utiliza un Backend-for-Frontend (BFF) o un Proxy reverso para inyectar estas cabeceras.
+
+## 5. Manejo de Tipos de Datos
+
+El API retorna JSON estándar. Asegúrate de respetar los tipos:
+* Precios y Cantidades: Vienen como `number` (float/double). No los trates como strings para evitar errores de cálculo.
+* Fechas: Formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss`).
