@@ -43,7 +43,7 @@ Obtener solo el código, descripción y precio de los productos, ignorando costo
 }
 ```
 
-## 2. Consultas Inteligentes (AI Querying)
+<!-- ## 2. Consultas Inteligentes (AI Querying)
 
 En esta versión se ha reemplazado la construcción manual de sentencias SQL en el cliente por un intérprete de intenciones basado en IA.
 
@@ -56,9 +56,9 @@ Acepta una frase en lenguaje natural que describe el filtro o la búsqueda desea
 * Filtrado Numérico: `GET /api/v1/products?q=productos con existencia mayor a 50 y precio menor a 20`
 * Búsqueda Compleja: `GET /api/v1/services?q=servicios relacionados con mantenimiento que cuesten menos de 100`
 
-**Nota: La efectividad de este filtro depende del motor de IA configurado en el servidor.**
+> **Nota: La efectividad de este filtro depende del motor de IA configurado en el servidor.** -->
 
-## 3. Paginación y Metadatos
+## 2. Paginación y Metadatos
 
 Para manejar grandes volúmenes de datos, el servidor implementa paginación automática.
 
