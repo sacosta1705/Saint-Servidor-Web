@@ -10,7 +10,7 @@ El objetivo de este espacio es proporcionar una base de conocimientos técnica, 
 
 Antes de proceder con la implementación del código, es mandatorio comprender los fundamentos operativos del servidor. La documentación se divide en los siguientes apartados:
 
-* [Protocolo de Autenticación](./docs/autenticacion.md): Gestión de credenciales iniciales y persistencia mediante el header `Pragma`.
+* [Protocolo de Autenticación](./docs/autenticacion.md): Gestión de credenciales iniciales.
 * [Consultas y Filtrado](./docs/consultar_y_filtros.md): Uso de operadores relacionales y optimización de tráfico (paginación y selección de campos).
 * [Arquitectura del Sistema](./docs/descripcion_arquitectura.md): Visión general del flujo de datos entre el cliente, el servidor y SQL Server.
 * [Mejores Prácticas](./docs/mejores_practicas.md): Estándares de seguridad, manejo de errores y rendimiento.
