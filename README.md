@@ -15,7 +15,7 @@ Antes de proceder con la implementación del código, es mandatorio comprender l
 * [Arquitectura del Sistema](./docs/descripcion_arquitectura.md): Visión general del flujo de datos entre el cliente, el servidor y SQL Server.
 * [Mejores Prácticas](./docs/mejores_practicas.md): Estándares de seguridad, manejo de errores y rendimiento.
 * [Diagnóstico de Errores](./docs/errores_comunes.md): Resolución de códigos de estado HTTP comunes.
-
+* [Archihvo de configuración](./docs/configuracion.md): Configuración de servidor.
 ---
 
 ## Ejemplos de Implementación
