@@ -1,7 +1,7 @@
 /venv
 __history/
 __recovery/
-win32/
+/Win32
 /.vscode
 GPATH
 GRTAGS
