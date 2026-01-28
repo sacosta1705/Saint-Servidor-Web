@@ -11,16 +11,19 @@ El Saint Sync Server actúa como una capa de abstracción y pasarela de comunica
 ## Diagrama de Componentes
 
 ```mermaid
-graph TD
-    Client[Aplicaciones Cliente] -->|JSON / HTTPS| SyncServer(Saint Sync Server)
-    
-    subgraph "Núcleo del Servidor"
-        SyncServer -->|"Auth (JWT)"| Security[Módulo de Seguridad]
-        SyncServer -->|Procesamiento de Lenguaje| AI["Motor de IA ej. Gemini/OpenAI"]
-        SyncServer -->|Eventos| Webhooks[Gestor de Webhooks]
-    end
-
-    Webhooks -->|Notificaciones| Messaging[WhatsApp / Telegram]
+flowchart TB
+ subgraph subGraph0["Núcleo del Servidor"]
+        Security["Módulo de Seguridad"]
+        SyncServer("Saint Sync Server")
+        AI["Motor de IA ej. Gemini/OpenAI"]
+        Webhooks["Gestor de Webhooks"]
+  end
+    Client["Aplicaciones Cliente"] -- JSON / HTTPS --> SyncServer
+    SyncServer -- Auth (JWT) --> Security
+    SyncServer -- Procesamiento de Lenguaje --> AI
+    SyncServer -- Eventos --> Webhooks
+    Webhooks -- Notificaciones --> Messaging["WhatsApp / Telegram"]
+    subGraph0 -- Reglas de negocio --> n1["Saint Enterprise Administrativo"]
 ```
 
 ## Motor de Inteligencia Artificial (AI Engine)
