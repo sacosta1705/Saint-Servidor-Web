@@ -38,7 +38,7 @@ Para pruebas dinámicas y consulta de la referencia completa de endpoints, utili
 ### Requisitos del Entorno
 1.  **Licencia Activa**: El servidor requiere una licencia válida de Saint Enterprise para operar.
 2.  **Actualización de DB**: Se debe ejecutar los queries de actualización ubicados en la carpera raiz del servidor en la base de datos de destino.
-3.  **Conectividad**: Asegurar que el puerto configurado en el Sync Server sea accesible desde el host al cliente.
+3.  **Conectividad**: Asegurar que el puerto configurado en el Sync Server sea accesible desde el host hasta el cliente.
 
 ---
 
