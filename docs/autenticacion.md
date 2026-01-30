@@ -68,8 +68,10 @@ Cuando el `access_token` expira, se utiliza el endpoint de refrescamiento para o
 - Endpoint: `POST /api/v1/auth/refresh`
 
 **Cuerpo:**
-```json
-{
-    "refresh_token": "301b7ffab774bb8dd2a0db4bd132595f0d3..."
-}
+```http
+POST /api/v1/auth/refresh
+Host: localhost:8080
+Content-Type: application/json    
+{"refresh_token": "301b7ffab774bb8dd2a0db4bd132595f0d3..."}
+
 ```
