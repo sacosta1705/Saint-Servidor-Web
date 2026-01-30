@@ -63,7 +63,7 @@ Credenciales para la integración con plataformas de chat externas (WhatsApp y T
 ## 6. Inteligencia Artificial (`ai`)
 Configura el motor de IA generativa. Permite definir múltiples proveedores y seleccionar cuál está activo.
 
-> *Nota: Al momento de definir los URL de cada API, asegurarse de escapar el simbolo '/'. Ej: `gemini.google.com/api` como `gemini.com\\/api`*
+> *Nota: Al momento de definir los URL de cada API, asegurarse de escapar el simbolo '/'. Ej: `gemini.google.com/api` como `gemini.com\/api`*
 
 ### Configuración Global
 * `active_provider`: Define cuál de los proveedores listados en el array `providers` se usará para procesar las consultas. Debe coincidir con el campo `name` de uno de los objetos.
