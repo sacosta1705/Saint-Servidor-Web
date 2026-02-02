@@ -129,7 +129,6 @@ begin
   except
     on E: Exception do
     begin
-      // AQUI ESTABA EL ERROR: Se requiere begin/end para multiples lineas
       Writeln('Excepcion critica: ', E.ClassName, ': ', E.Message);
       Readln;
     end;

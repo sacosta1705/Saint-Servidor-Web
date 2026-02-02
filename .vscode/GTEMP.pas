@@ -1,73 +1,95 @@
-unit actualizacion_inventario;
+program saint_auth;
 
-interface
+{$APPTYPE CONSOLE}
+{$R *.res}
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls,
-  Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, System.Net.HttpClientComponent,
-  System.Net.HttpClient, System.Net.URLClient, System.NetEncoding, System.JSON;
+  System.SysUtils,
+  System.Classes,
+  System.Net.HttpClient,
+  System.Net.URLClient,
+  System.JSON,
+  System.Net.HttpClientComponent;
 
-type
-  TForm1 = class(TForm)
-    edCodProd: TEdit;
-    edNuevaExistencia: TEdit;
-    Button1: TButton;
-    Label1: TLabel;
-    Label2: TLabel;
-    memoLog: TMemo;
-    procedure Button1Click(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-  private
-    const
-      API_URL = 'http://localhost:8080/api/v1';
-      API_KEY = 'B5D31933-C996-476C-B116-EF212A41479A';
-      API_ID = '1093';
-    function IniciarSesion: string;
-  public
-  end;
+const
+  API_URL = 'http://localhost:8080/api/v1';
+  API_KEY = 'B5D31933-C996-476C-B116-EF212A41479A';
+  API_ID = '1093';
+  USER = '001';
+  PASSWORD = '12345';
+  DEVICE_ID = 'DELPHI_CONSOLE_APP';
 
-var
-  Form1: TForm1;
-
-implementation
-
-{$R *.dfm}
-
-function TForm1.IniciarSesion: string;
+function GetToken(): string;
 var
   HTTP: TNetHTTPClient;
   Response: IHTTPResponse;
-  JSONBody: TJSONObject;
   RequestBody: TStringStream;
-  AuthB64: string;
+  JSONBody: TJSONObject;
+  JSONResponse, JSONData: TJSONValue;
+  SuccessVal: TJSONValue;
 begin
   Result := '';
-  memoLog.Lines.Add('>> INICIO SESION: Creando cliente HTTP...');
   HTTP := TNetHTTPClient.Create(nil);
   JSONBody := TJSONObject.Create;
-  try
-    memoLog.Lines.Add('>> INICIO SESION: Codificando credenciales Basic Auth...');
-    AuthB64 := TNetEncoding.Base64.Encode('001:12345').Replace(#13, '').Replace(#10, '');
 
+  try
+    // 1. Configurar Headers
     HTTP.CustomHeaders['x-api-key'] := API_KEY;
     HTTP.CustomHeaders['x-api-id'] := API_ID;
-    HTTP.CustomHeaders['Authorization'] := 'Basic ' + AuthB64;
     HTTP.ContentType := 'application/json';
 
-    JSONBody.AddPair('terminal', 'delphi_inv_update');
-    memoLog.Lines.Add('>> INICIO SESION: Cuerpo login: ' + JSONBody.ToString);
+    // 2. Construir Body
+    JSONBody.AddPair('username', USER);
+    JSONBody.AddPair('password', PASSWORD);
+    JSONBody.AddPair('device_id', DEVICE_ID);
 
     RequestBody := TStringStream.Create(JSONBody.ToString, TEncoding.UTF8);
+
     try
-      Response := HTTP.Post(API_URL + '/main/login', RequestBody);
-      memoLog.Lines.Add('>> INICIO SESION: Respuesta Status: ' + Response.StatusCode.ToString);
+      Writeln('Conectando a: ' + API_URL + '/auth/login');
+
+      Response := HTTP.Post(API_URL + '/auth/login', RequestBody);
 
       if Response.StatusCode = 200 then
       begin
-        Result := Response.HeaderValue['Pragma'];
-        memoLog.Lines.Add('>> INICIO SESION: Token Pragma recibido con Exito: ' + Result);
+        // 3. Parsear Respuesta (Metodo compatible sin Generics)
+        JSONResponse := TJSONObject.ParseJSONValue
+          (Response.ContentAsString(TEncoding.UTF8));
+        try
+          if Assigned(JSONResponse) and (JSONResponse is TJSONObject) then
+          begin
+            // Verificar "success" obteniendo el valor como string y comparando
+            SuccessVal := (JSONResponse as TJSONObject).GetValue('success');
+
+            if Assigned(SuccessVal) and (LowerCase(SuccessVal.Value) = 'true')
+            then
+            begin
+              // Extraer 'data'
+              JSONData := (JSONResponse as TJSONObject).GetValue('data');
+
+              if Assigned(JSONData) and (JSONData is TJSONObject) then
+              begin
+                // Extraer 'access_token'
+                Result := (JSONData as TJSONObject)
+                  .GetValue('access_token').Value;
+              end;
+            end
+            else
+            begin
+              Writeln('Error logico en respuesta: ' +
+                (JSONResponse as TJSONObject).GetValue('message').Value);
+            end;
+          end;
+        finally
+          JSONResponse.Free;
+        end;
+      end
+      else
+      begin
+        Writeln('Error HTTP: ' + Response.StatusCode.ToString);
+        Writeln('Respuesta: ' + Response.ContentAsString());
       end;
+
     finally
       RequestBody.Free;
     end;
@@ -77,66 +99,39 @@ begin
   end;
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
 var
-  HTTP: TNetHTTPClient;
   Token: string;
-  RequestBody: TStringStream;
-  JSONData: TJSONObject;
-  Response: IHTTPResponse;
-  Endpoint: string;
+
 begin
-  memoLog.Lines.Clear;
-  memoLog.Lines.Add('1. Solicitando sesi�n...');
-  Token := IniciarSesion;
-
-  if Token = '' then
-  begin
-    memoLog.Lines.Add('!! Error: Token de sesi�n vac�o.');
-    Exit;
-  end;
-
-  memoLog.Lines.Add('2. Inicializando componentes de actualizaci�n...');
-  HTTP := TNetHTTPClient.Create(nil);
-  JSONData := TJSONObject.Create;
   try
-    memoLog.Lines.Add('3. Parseando existencia y creando JSON...');
-    JSONData.AddPair('existen', TJSONNumber.Create(StrToFloatDef(edNuevaExistencia.Text, 0)));
+    Writeln('Iniciando proceso de autenticacion V2...');
+    Token := GetToken();
 
-    Endpoint := API_URL + '/adm/product/' + edCodProd.Text;
-    memoLog.Lines.Add('4. Endpoint destino: ' + Endpoint);
-
-    HTTP.CustomHeaders['Pragma'] := Token;
-
-    memoLog.Lines.Add('5. Preparando StringStream (UTF8)...');
-    RequestBody := TStringStream.Create(JSONData.ToString, TEncoding.UTF8);
-    RequestBody.Position := 0;
-    memoLog.Lines.Add('   Contenido del body: ' + JSONData.ToString);
-
-    try
-      memoLog.Lines.Add('6. Ejecutando POST con Content-Type: application/json...');
-
-      Response := HTTP.Post(Endpoint, RequestBody, nil,
-        [TNetHeader.Create('Content-Type', 'application/json')]);
-
-      memoLog.Lines.Add('7. Recibiendo respuesta del servidor...');
-      if Response.StatusCode in [200, 201] then
-        memoLog.Lines.Add('�xito: Producto actualizado correctamente.')
-      else
-        memoLog.Lines.Add('Fallo: ' + Response.StatusCode.ToString + ' - ' + Response.ContentAsString);
-
-    finally
-      RequestBody.Free;
+    if Token <> '' then
+    begin
+      Writeln('');
+      Writeln('--------------------------------------------------');
+      Writeln('AUTENTICACION EXITOSA');
+      Writeln('--------------------------------------------------');
+      Writeln('Access Token (JWT):');
+      Writeln(Token);
+      Writeln('--------------------------------------------------');
+    end
+    else
+    begin
+      Writeln('No se pudo obtener el token.');
     end;
-  finally
-    JSONData.Free;
-    HTTP.Free;
-  end;
-end;
 
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  memoLog.Lines.Clear;
-end;
+    Writeln('');
+    Writeln('Presione ENTER para salir...');
+    Readln;
+
+  except
+    on E: Exception do
+    begin
+      Writeln('Excepcion critica: ', E.ClassName, ': ', E.Message);
+      Readln;
+    end;
+  end;
 
 end.

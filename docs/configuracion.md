@@ -11,7 +11,7 @@ Define cómo el servidor acepta y maneja las conexiones HTTP entrantes.
 | :--- | :--- | :--- | :--- |
 | `port` | Entero | El puerto TCP donde el servidor escuchará peticiones. | `8080` |
 | `pool_max_threads` | Entero | Número máximo de hilos de ejecución simultáneos para procesar solicitudes. Afecta el rendimiento en cargas altas. | `100` |
-| `rate_limit_count` | Entero | Cantidad máxima de peticiones permitidas por IP en un minuto (Protección DDoS básica). | `200` |
+| `rate_limit_count` | Entero | Cantidad máxima de peticiones permitidas por IP en un minuto (Protección DDoS). | `200` |
 | `max_connections` | Entero | Número máximo de conexiones TCP simultáneas que el servidor aceptará antes de rechazar nuevas. | `1000` |
 | `listen_queue` | Entero | Tamaño de la cola de espera para conexiones entrantes pendientes de ser aceptadas (Backlog). | `200` |
 | `keep_alive` | Booleano | Mantiene las conexiones HTTP abiertas para múltiples peticiones, mejorando el rendimiento. | `true` |
@@ -21,7 +21,7 @@ Configura la conexión obligatoria con la base de datos de Saint Enterprise Admi
 
 | Parámetro | Descripción |
 | :--- | :--- |
-| `driver` | Tipo de motor de base de datos. Actualmente soporta soloo `MSSQL`. |
+| `driver` | Tipo de motor de base de datos. Actualmente soporta solo `MSSQL`. |
 | `server` | Dirección IP o Hostname del servidor SQL. Use `localhost` si está en la misma máquina. |
 | `port` | Puerto del motor SQL (Por defecto MSSQL usa `1433`). |
 | `default_database` | Base de datos inicial para la conexión (generalmente `master`). |
