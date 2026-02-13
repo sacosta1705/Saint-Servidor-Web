@@ -1,4 +1,4 @@
-# Mejores Prácticas de Integración (v2.0)
+# Mejores Prácticas de Integración
 
 Para garantizar una integración estable, segura y de alto rendimiento con el Saint Sync Server, se recomienda adherirse a los siguientes patrones de diseño.
 
