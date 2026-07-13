@@ -40,6 +40,10 @@ Para pruebas dinámicas y consulta de la referencia completa de endpoints, utili
 2.  **Actualización de DB**: Se debe ejecutar los queries de actualización ubicados en la carpera raiz del servidor en la base de datos de destino.
 3.  **Conectividad**: Asegurar que el puerto configurado en el Sync Server sea accesible desde el host hasta el cliente.
 
+## Credenciales de pruebas
+- Api ID: B5D31933-C996-476C-B116-EF212A41479A
+- Api Key: 1093
+
 ---
 
 ## Registro de Cambios
