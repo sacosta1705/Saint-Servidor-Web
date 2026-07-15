@@ -51,4 +51,4 @@ Consulte el archivo [CHANGELOG.md](./CHANGELOG.md) para estar al tanto de las ú
 
 ---
 
-© 2026 Saint de Venezuela. Todos los derechos reservados.
+© 2026 Saintnet Latinoamerica. Todos los derechos reservados.
